@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Crie o conjunto 'countries' no ipset
-sudo ipset create countries hash:net,port
+#sudo ipset create countries hash:net,port (caso ainda não tenha criado)
 
 # Defina os códigos dos países que deseja bloquear
 COUNTRIES=('cn' 'ru' 'tw' 'kp')
