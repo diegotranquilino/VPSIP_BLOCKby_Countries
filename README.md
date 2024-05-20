@@ -15,3 +15,16 @@ Salve o script em um arquivo, por exemplo, block_countries.sh
 Dê permissão de execução ao arquivo com o comando chmod +x block_countries.sh
 
 Execute o script com sudo ./block_countries.sh
+
+Blacklist management
+
+Crie um conjunto no ipset:
+sudo ipset create blacklist hash:ip
+
+Adicione o IP à lista negra:
+sudo ipset add blacklist 143.198.76.118
+
+Crie uma regra no iptables para bloquear todos os IPs na lista negra:
+sudo iptables -I INPUT -m set --match-set blacklist src -j DROP
+
+Lembre-se de salvar as configurações do iptables e do ipset para que elas persistam após reinicializações do sistema. Para o iptables, você pode usar o iptables-save e para o ipset, você pode usar o ipset save
