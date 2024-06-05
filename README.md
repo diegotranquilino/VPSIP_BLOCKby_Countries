@@ -1,51 +1,63 @@
 # VPS-BLOCK-Countries
 This directory is to prevent direct attacks from determined Countries
 
-Para proteger seu VPS Linux de ataques originados de um país específico, você pode utilizar a ferramenta ipset em conjunto com o iptables. Aqui está um guia passo a passo sobre como fazer isso:
+To protect your Linux VPS from attacks originating from a specific country, you can use the ipset tool in conjunction with iptables. Here is a step-by-step guide on how to do this:
 
-Instale o ipset:
-No Debian: apt update && apt install ipset
-No Ubuntu: sudo apt update && sudo apt install ipset
-No CentOS: sudo yum install ipset
-Crie um conjunto no ipset para conter os países cujos endereços IP você deseja bloquear:
+Install ipset:
+On Debian: 
+```
+apt update && apt install ipset
+```
+On Ubuntu:
+```
+sudo apt update && sudo apt install ipset'
+```
+On CentOS: 
+```
+sudo yum install ipset
+```
+Create a set in ipset to contain the countries whose IP addresses you want to block:
 ipset create countries hash:net,port
 
-Salve o script em um arquivo, por exemplo, block_countries.sh
+Save the script to a file, for example block_countries.sh
 
-Dê permissão de execução ao arquivo com o comando chmod +x block_countries.sh
+Give the file execution permission with the command
+```
+chmod +x block_countries.sh
+```
+Run the script with 
+```
+sudo ./block_countries.sh
+```
 
-Execute o script com sudo ./block_countries.sh
+<h2>Unblock countries that have been blocked</h2>
 
-<h2>Liberar países que foram bloqueados</h2>
+To allow access to a country that was previously blocked on your Linux VPS, you can follow these steps:
 
-Para liberar o acesso de um país que foi previamente bloqueado no seu VPS Linux, você pode seguir estes passos:
-
-Identifique o conjunto do ipset que contém os endereços IP do país que você deseja desbloquear. Se você seguiu o guia anterior, o conjunto deve ser chamado countries.
-Remova os endereços IP do país do conjunto do ipset. Por exemplo, para remover os IPs da China, você usaria o seguinte comando:
+Identify the ipset set that contains the IP addresses of the country you want to unblock. If you followed the previous guide, the set should be called countries.
+Remove the country IP addresses from the ipset set. For example, to remove China IPs, you would use the following command:
 for ip in $(wget -O - http://www.ipdeny.com/ipblocks/data/countries/cn.zone)
-do
-  sudo ipset del countries $ip
+of
+ sudo ipset del countries $ip
 done
 
-Repita o processo para cada país que você deseja desbloquear, substituindo ‘cn’ pelo código do país correspondente.
-Salve as alterações no ipset para que elas persistam após a reinicialização:
+Repeat the process for each country you want to unlock, replacing 'cn' with the corresponding country code.
+Save changes to ipset so they persist after reboot:
 sudo ipset save > /etc/ipset.conf
 
-Verifique se o iptables está configurado corretamente para não bloquear mais o tráfego desses IPs.
-Lembre-se de que, ao remover os IPs de um país do conjunto do ipset, você está permitindo que todo o tráfego daquele país acesse seu servidor novamente. Portanto, certifique-se de que isso está alinhado com sua política de segurança e considere manter outras medidas de segurança para proteger seu VPS.
-
-
+Make sure iptables is configured correctly to no longer block traffic from these IPs.
+Remember that by removing a country's IPs from the ipset set, you are allowing all traffic from that country to access your server again. So make sure this is in line with your security policy and consider maintaining other security measures to protect your VPS.
 
 
 <h2>Blacklist management</h2>
 
-Crie um conjunto no ipset:
+Create a set in ipset:
 sudo ipset create blacklist hash:ip
 
-Adicione o IP à lista negra:
+Add IP to blacklist:
 sudo ipset add blacklist 143.198.76.118
 
-Crie uma regra no iptables para bloquear todos os IPs na lista negra:
+Create a rule in iptables to block all blacklisted IPs:
 sudo iptables -I INPUT -m set --match-set blacklist src -j DROP
 
-Lembre-se de salvar as configurações do iptables e do ipset para que elas persistam após reinicializações do sistema. Para o iptables, você pode usar o iptables-save e para o ipset, você pode usar o ipset save
+Remember to save your iptables and ipset settings so they persist across system restarts. For iptables you can use iptables-save and for ipset you can use ipset save
